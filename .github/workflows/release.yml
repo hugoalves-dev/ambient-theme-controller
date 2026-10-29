@@ -1,0 +1,103 @@
+name: Build and release PoCs
+
+on:
+  pull_request:
+    types: [opened, synchronize, reopened]
+  push:
+    branches: [main]
+
+permissions:
+  contents: read
+
+jobs:
+  android:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: ${{ github.event.pull_request.head.sha || github.sha }}
+      - uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: '17'
+      - uses: subosito/flutter-action@v2
+        with:
+          flutter-version: '3.47.6'
+          channel: stable
+          cache: true
+      - name: Test and analyze
+        working-directory: poc/android-sensor
+        run: |
+          flutter pub get
+          flutter test
+          flutter analyze
+      - name: Build ARM64 APK
+        working-directory: poc/android-sensor
+        run: flutter build apk --release --target-platform android-arm64 --build-name "0.1.${{ github.run_number }}" --build-number "${{ github.run_number }}"
+      - name: Collect APK
+        run: |
+          mkdir -p release-assets
+          cp poc/android-sensor/build/app/outputs/flutter-apk/app-release.apk release-assets/ambient-sensor-poc-android-arm64.apk
+      - uses: actions/upload-artifact@v4
+        with:
+          name: android-arm64
+          path: release-assets/*.apk
+          if-no-files-found: error
+
+  windows:
+    runs-on: windows-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: ${{ github.event.pull_request.head.sha || github.sha }}
+      - uses: actions/setup-dotnet@v4
+        with:
+          dotnet-version: '10.0.x'
+      - name: Test Windows PoC
+        run: dotnet test poc/windows-theme/tests/ThemeProbe.Tests.csproj --configuration Release
+      - name: Publish portable Windows x64 executable
+        shell: pwsh
+        run: |
+          dotnet publish poc/windows-theme/ThemeProbe.csproj -c Release -r win-x64 --self-contained true -p:PublishSingleFile=true -p:DebugType=None -p:DebugSymbols=false -o release-assets
+          if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
+          Move-Item -LiteralPath release-assets/ThemeProbe.exe -Destination release-assets/ambient-theme-poc-windows-x64.exe
+      - uses: actions/upload-artifact@v4
+        with:
+          name: windows-x64
+          path: release-assets/ambient-theme-poc-windows-x64.exe
+          if-no-files-found: error
+
+  release:
+    needs: [android, windows]
+    if: github.event_name == 'push' || github.event.pull_request.head.repo.full_name == github.repository
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+    steps:
+      - uses: actions/download-artifact@v4
+        with:
+          path: release-assets
+          merge-multiple: true
+      - name: Publish GitHub Release
+        env:
+          GH_TOKEN: ${{ github.token }}
+          GH_REPO: ${{ github.repository }}
+          EVENT_NAME: ${{ github.event_name }}
+          PR_NUMBER: ${{ github.event.pull_request.number }}
+          TARGET_SHA: ${{ github.event.pull_request.head.sha || github.sha }}
+          RUN_NUMBER: ${{ github.run_number }}
+          RUN_ATTEMPT: ${{ github.run_attempt }}
+        shell: bash
+        run: |
+          set -euo pipefail
+          version="0.1.${RUN_NUMBER}"
+          prerelease=()
+          if [[ "$EVENT_NAME" == "pull_request" ]]; then
+            tag="v${version}-alpha.pr${PR_NUMBER}.r${RUN_ATTEMPT}"
+            prerelease=(--prerelease)
+          else
+            tag="v${version}"
+          fi
+          cd release-assets
+          sha256sum ambient-sensor-poc-android-arm64.apk ambient-theme-poc-windows-x64.exe > SHA256SUMS.txt
+          gh release create "$tag" --target "$TARGET_SHA" --title "$tag — PoC builds" "${prerelease[@]}" --notes "Experimental PoCs, not the finished MVP. Android APK is signed with a debug key; Windows is a portable x64 console probe. Source commit: $TARGET_SHA." ambient-sensor-poc-android-arm64.apk ambient-theme-poc-windows-x64.exe SHA256SUMS.txt
