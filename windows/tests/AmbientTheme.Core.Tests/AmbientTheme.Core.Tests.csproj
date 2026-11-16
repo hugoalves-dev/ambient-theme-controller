@@ -18,6 +18,7 @@
 
   <ItemGroup>
     <ProjectReference Include="..\..\src\AmbientTheme.Core\AmbientTheme.Core.csproj" />
+    <ProjectReference Include="..\..\tools\SensorSimulator\AmbientTheme.SensorSimulator.csproj" />
   </ItemGroup>
 
 </Project>
