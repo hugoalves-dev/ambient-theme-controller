@@ -2,11 +2,14 @@
 
 Android as an **external ambient-light sensor** for Windows 11: measure room brightness in lux, recommend light/dark themes, and optionally switch **Windows system and application themes together**.
 
-> **Project status:** architecture and PoC documented; the application itself has **not been implemented** yet.
+> **Project status:** the Windows side of the Free MVP is implemented and covered by automated tests ([windows/](windows/README.md)). The Android app is not finished, and nothing has been validated on physical phones yet. Not ready for end users.
 
 ## What has been validated
 
-A local bidirectional WebSocket proof of concept was completed with Android (Termux/Python server) and Windows 11 (PowerShell/.NET client). In a Windows-created Wi-Fi hotspot configuration, the Windows client received simulated 5/25/50/100/200 lux measurements and returned acknowledgments without root/admin privileges. **Physical light-sensor acquisition, background reliability, secure pairing and theme switching remain unvalidated.**
+- **Transport (PoC, real devices):** a local bidirectional WebSocket between Android (Termux/Python server) and Windows 11 (PowerShell/.NET client) over a Windows-created Wi-Fi hotspot, with simulated 5/25/50/100/200 lux samples, without root/admin.
+- **Windows implementation (automated tests on Windows 11):** versioned protocol and validation, local settings and DPAPI-protected credentials, recommendation engine, automation state machine, joint apps+system theme writes with external-change detection, and a certificate-pinned WSS client exercised against a simulator of the Android side.
+
+**Still unvalidated:** physical light-sensor acquisition, Android background behavior, pairing and discovery on real phones, and the visual result of switching the real Windows theme. See the open issues.
 
 ## Planned architecture
 
@@ -17,6 +20,8 @@ A local bidirectional WebSocket proof of concept was completed with Android (Ter
 
 ## Documentation
 
+- [Windows implementation](windows/README.md)
+- [Local protocol v1](docs/protocol/protocol-v1.md)
 - [Architecture / design](docs/superpowers/specs/2026-10-22-ambient-theme-controller-design.md)
 - [Architectural decisions (ADRs)](docs/adr/2026-10-22-ambient-theme-controller-adrs.md)
 - [Brainstorm reference](docs/brainstorm/2026-10-22-ambient-theme-controller.md)

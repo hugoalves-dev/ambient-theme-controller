@@ -62,6 +62,9 @@ jobs:
           dotnet publish poc/windows-theme/ThemeProbe.csproj -c Release -r win-x64 --self-contained true -p:PublishSingleFile=true -p:DebugType=None -p:DebugSymbols=false -o release-assets
           if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
           Move-Item -LiteralPath release-assets/ThemeProbe.exe -Destination release-assets/ambient-theme-poc-windows-x64.exe
+          dotnet publish windows/src/AmbientTheme.App -c Release -r win-x64 --self-contained true -p:PublishSingleFile=true -p:IncludeNativeLibrariesForSelfExtract=true -p:DebugType=None -o app-publish
+          if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
+          Move-Item -LiteralPath app-publish/AmbientThemeController.exe -Destination release-assets/ambient-theme-controller-windows-x64.exe
       - uses: actions/upload-artifact@v4
         with:
           name: windows-x64

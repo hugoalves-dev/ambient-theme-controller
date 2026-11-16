@@ -28,6 +28,7 @@ public sealed record AppSettings
     public string? ManualEndpoint { get; init; }
     public ThemeSnapshot? LastObservedTheme { get; init; }
 
+    [System.Text.Json.Serialization.JsonIgnore]
     public bool IsValid =>
         Thresholds.TryCreate(DarkBelowLux, LightAboveLux, out _)
         && DwellSeconds >= 0

@@ -1,5 +1,6 @@
 <Solution>
   <Folder Name="/src/">
+    <Project Path="src/AmbientTheme.App/AmbientTheme.App.csproj" />
     <Project Path="src/AmbientTheme.Core/AmbientTheme.Core.csproj" />
     <Project Path="src/AmbientTheme.Windows/AmbientTheme.Windows.csproj" />
   </Folder>

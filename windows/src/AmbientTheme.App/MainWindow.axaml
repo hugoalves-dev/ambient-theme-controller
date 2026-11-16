@@ -1,0 +1,73 @@
+<Window xmlns="https://github.com/avaloniaui"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        x:Class="AmbientTheme.App.MainWindow"
+        Width="580" Height="760" MinWidth="460"
+        Title="Ambient Theme Controller">
+    <ScrollViewer>
+        <StackPanel Margin="24" Spacing="10">
+            <TextBlock x:Name="SimulatedBanner" IsVisible="False" FontWeight="Bold" Foreground="OrangeRed" TextWrapping="Wrap"
+                       Text="MODO DE DESENVOLVIMENTO: leituras SIMULADAS estão sendo aceitas. Não use como evidência." />
+            <TextBlock x:Name="SettingsWarning" IsVisible="False" Foreground="OrangeRed" TextWrapping="Wrap" />
+
+            <TextBlock Text="Estado" FontSize="18" FontWeight="SemiBold" />
+            <Grid ColumnDefinitions="120,*" RowDefinitions="Auto,Auto,Auto,Auto,Auto">
+                <TextBlock Grid.Row="0" Text="Rede" Opacity="0.7" Margin="0,3" />
+                <TextBlock Grid.Row="0" Grid.Column="1" x:Name="NetworkText" TextWrapping="Wrap" Margin="0,3" />
+                <TextBlock Grid.Row="1" Text="Identidade" Opacity="0.7" Margin="0,3" />
+                <TextBlock Grid.Row="1" Grid.Column="1" x:Name="IdentityText" TextWrapping="Wrap" Margin="0,3" />
+                <TextBlock Grid.Row="2" Text="Sensor" Opacity="0.7" Margin="0,3" />
+                <TextBlock Grid.Row="2" Grid.Column="1" x:Name="SensorText" TextWrapping="Wrap" Margin="0,3" />
+                <TextBlock Grid.Row="3" Text="Automação" Opacity="0.7" Margin="0,3" />
+                <TextBlock Grid.Row="3" Grid.Column="1" x:Name="AutomationText" TextWrapping="Wrap" FontWeight="SemiBold" Margin="0,3" />
+                <TextBlock Grid.Row="4" Text="Recomendação" Opacity="0.7" Margin="0,3" />
+                <TextBlock Grid.Row="4" Grid.Column="1" x:Name="RecommendationText" TextWrapping="Wrap" Margin="0,3" />
+            </Grid>
+
+            <TextBlock Text="Modo" FontSize="18" FontWeight="SemiBold" Margin="0,12,0,0" />
+            <RadioButton x:Name="AutoRadio" GroupName="Mode" Content="Automático — troca o tema de aplicativos e do sistema juntos" />
+            <RadioButton x:Name="RecommendRadio" GroupName="Mode" Content="Somente recomendar — nunca altera o tema" />
+            <RadioButton x:Name="PauseRadio" GroupName="Mode" Content="Pausado" />
+            <TextBlock Opacity="0.7" TextWrapping="Wrap"
+                       Text="Sem leitura confiável do celular o tema atual é mantido. Se você trocar o tema por fora, a automação fica pausada até você retomar." />
+
+            <TextBlock Text="Luminosidade" FontSize="18" FontWeight="SemiBold" Margin="0,12,0,0" />
+            <ComboBox x:Name="PresetBox" MinWidth="240" />
+            <StackPanel Orientation="Horizontal" Spacing="8">
+                <TextBlock Text="Escuro abaixo de" VerticalAlignment="Center" />
+                <TextBox x:Name="DarkBox" Width="80" />
+                <TextBlock Text="lx · claro acima de" VerticalAlignment="Center" />
+                <TextBox x:Name="LightBox" Width="80" />
+                <TextBlock Text="lx" VerticalAlignment="Center" />
+                <Button x:Name="ApplyThresholdsButton" Content="Aplicar" />
+            </StackPanel>
+            <TextBlock x:Name="ThresholdMessage" TextWrapping="Wrap" Opacity="0.7"
+                       Text="Entre os dois valores o tema é mantido. São valores sugeridos para experimentar, não recomendações médicas." />
+
+            <TextBlock Text="Celular" FontSize="18" FontWeight="SemiBold" Margin="0,12,0,0" />
+            <TextBlock x:Name="PairingText" TextWrapping="Wrap" />
+            <TextBox x:Name="EndpointBox" PlaceholderText="Endereço mostrado no celular, por exemplo 192.168.137.175:8766" />
+            <StackPanel Orientation="Horizontal" Spacing="8">
+                <Button x:Name="SaveEndpointButton" Content="Salvar endereço" />
+                <Button x:Name="PairButton" Content="Parear celular…" />
+                <Button x:Name="UnpairButton" Content="Esquecer celular" />
+            </StackPanel>
+            <TextBlock x:Name="EndpointMessage" TextWrapping="Wrap" Foreground="OrangeRed" IsVisible="False" />
+            <Expander Header="Como conectar" HorizontalAlignment="Stretch">
+                <TextBlock TextWrapping="Wrap" xml:space="preserve">Nada é enviado para a nuvem: o computador conversa direto com o celular pela rede local.
+
+• Mesmo Wi-Fi: inicie a sessão de sensor no celular e digite aqui o endereço que ele mostra.
+• Rede restrita (por exemplo, empresa): ligue o Hotspot móvel do Windows (Configurações › Rede e Internet › Hotspot móvel), conecte o celular nele e use o endereço mostrado no celular. O hotspot depende do adaptador e pode estar bloqueado por política.
+• Se a conexão não for concluída, a rede pode não permitir tráfego entre os aparelhos. O aplicativo não contorna firewall nem políticas de rede.</TextBlock>
+            </Expander>
+
+            <TextBlock Text="Preferências" FontSize="18" FontWeight="SemiBold" Margin="0,12,0,0" />
+            <CheckBox x:Name="NotificationsBox" Content="Mostrar notificações" />
+            <StackPanel Orientation="Horizontal" Spacing="8">
+                <Button x:Name="ExportButton" Content="Exportar configurações…" />
+                <Button x:Name="ImportButton" Content="Importar configurações…" />
+            </StackPanel>
+            <TextBlock x:Name="BackupMessage" TextWrapping="Wrap" Opacity="0.7"
+                       Text="A exportação não inclui identidade nem credenciais; depois de importar é preciso parear de novo." />
+        </StackPanel>
+    </ScrollViewer>
+</Window>

@@ -8,6 +8,7 @@ public enum ThemeKind { Light, Dark }
 public sealed record ThemeSnapshot(int? Apps, int? System)
 {
     /// <summary>The single theme both values agree on, or null when mixed, missing or invalid.</summary>
+    [System.Text.Json.Serialization.JsonIgnore]
     public ThemeKind? Unified => (Apps, System) switch
     {
         (1, 1) => ThemeKind.Light,

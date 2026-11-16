@@ -250,6 +250,9 @@ public sealed class AutomationCoordinator
         return true;
     }
 
+    /// <summary>Rebuilds the engine after thresholds or timings were replaced as a whole (settings import).</summary>
+    public void ReloadSettings() => Run(() => _engine = CreateEngine());
+
     /// <summary>Drives watchdogs, stabilization and dwell. Call about once per second.</summary>
     public void Tick(TimeSpan now) => Run(() =>
     {
