@@ -1,0 +1,10 @@
+<Solution>
+  <Folder Name="/src/">
+    <Project Path="src/AmbientTheme.Core/AmbientTheme.Core.csproj" />
+    <Project Path="src/AmbientTheme.Windows/AmbientTheme.Windows.csproj" />
+  </Folder>
+  <Folder Name="/tests/">
+    <Project Path="tests/AmbientTheme.Core.Tests/AmbientTheme.Core.Tests.csproj" />
+    <Project Path="tests/AmbientTheme.Windows.Tests/AmbientTheme.Windows.Tests.csproj" />
+  </Folder>
+</Solution>
