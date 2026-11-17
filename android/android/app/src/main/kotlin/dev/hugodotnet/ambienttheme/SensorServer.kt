@@ -26,6 +26,7 @@ class SensorServer(
     private val appVersion: String,
     private val registry: PairingRegistry,
     private val onChange: () -> Unit,
+    private val onAuthenticated: () -> Unit = {},
 ) : WebSocketServer(InetSocketAddress(port)) {
     private val handlers = ConcurrentHashMap<WebSocket, SessionHandler>()
 
@@ -65,12 +66,17 @@ class SensorServer(
         val handler = handlers[connection] ?: return
         val wasAuthenticated = handler.authenticated
         val reply = handler.receive(text)
+        // Diagnostics without payloads: message kinds and error codes only, never credentials or tokens.
+        Log.i("AmbientTheme", "received ${Codec.decode(text)?.javaClass?.simpleName ?: "UNDECODABLE(${text.length}B)"}" +
+            " -> " + reply.messages.joinToString { (it as? dev.hugodotnet.ambienttheme.core.ProtocolError)?.let { e -> "ERROR:${e.code}" } ?: it.javaClass.simpleName } +
+            if (reply.close) " (closing)" else "")
         reply.messages.forEach { connection.send(Codec.encode(it)) }
         if (reply.close) {
             connection.close()
         } else if (!wasAuthenticated && handler.authenticated) {
             // One source, one consumer: a new authenticated session replaces the previous one.
             handlers.filter { it.key != connection && it.value.authenticated }.keys.forEach { it.close() }
+            onAuthenticated()
         }
         onChange()
     }

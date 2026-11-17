@@ -32,6 +32,19 @@ jobs:
           flutter pub get
           flutter test
           flutter analyze
+      - name: Test and analyze the Android app
+        working-directory: android
+        run: |
+          flutter pub get
+          flutter test
+          flutter analyze
+          cd android && ./gradlew :app:testDebugUnitTest --console=plain
+      - name: Build Android app (debug-signed, experimental)
+        working-directory: android
+        run: |
+          flutter build apk --release --target-platform android-arm64 --build-name "0.1.${{ github.run_number }}" --build-number "${{ github.run_number }}"
+          mkdir -p ../release-assets
+          cp build/app/outputs/flutter-apk/app-release.apk ../release-assets/ambient-theme-android-arm64.apk
       - name: Build ARM64 APK
         working-directory: poc/android-sensor
         run: flutter build apk --release --target-platform android-arm64 --build-name "0.1.${{ github.run_number }}" --build-number "${{ github.run_number }}"

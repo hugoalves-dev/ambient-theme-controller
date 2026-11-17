@@ -134,6 +134,11 @@ class _SessionPageState extends State<SessionPage> {
           TextField(
             key: const Key('inviteText'),
             controller: _inviteText,
+            autocorrect: false,
+            enableSuggestions: false,
+            keyboardType: TextInputType.url,
+            minLines: 3,
+            maxLines: 5,
             decoration: const InputDecoration(hintText: 'ambienttheme://pair?...'),
           ),
           Align(

@@ -2,7 +2,7 @@
 // client receives, using the same DeviceClient as the product. It never touches the Windows theme.
 //
 //   LinkProbe <host:port>            pair (prints the invite to scan or paste on the phone), then listen
-//   LinkProbe <host:port> --seconds 60
+//   LinkProbe <host:port> --seconds 60 --wait 45   (wait N seconds instead of Enter before pairing)
 using AmbientTheme.Core.Connection;
 using AmbientTheme.Core.Protocol;
 
@@ -12,14 +12,28 @@ if (args.Length == 0 || !Endpoint.TryParse(args[0], out var endpoint))
     return 1;
 }
 
-var seconds = args.Length == 3 && args[1] == "--seconds" && int.TryParse(args[2], out var parsed) ? parsed : 30;
+static int Option(string[] args, string name, int fallback) =>
+    Array.IndexOf(args, name) is var index and >= 0 && index + 1 < args.Length && int.TryParse(args[index + 1], out var value)
+        ? value
+        : fallback;
+
+var seconds = Option(args, "--seconds", 30);
+var waitSeconds = Option(args, "--wait", 0);
 var client = new DeviceClient();
 var invite = PairingInvite.Create("linkprobe-" + Environment.MachineName.ToLowerInvariant(), "LinkProbe", DateTimeOffset.UtcNow);
 
 Console.WriteLine("Invite (scan as QR or paste on the phone), valid for 2 minutes:");
 Console.WriteLine(invite.ToUri());
-Console.WriteLine("Press Enter after the phone accepted the invite...");
-Console.ReadLine();
+if (waitSeconds > 0)
+{
+    Console.WriteLine($"Waiting {waitSeconds} s for the phone to accept the invite...");
+    await Task.Delay(TimeSpan.FromSeconds(waitSeconds));
+}
+else
+{
+    Console.WriteLine("Press Enter after the phone accepted the invite...");
+    Console.ReadLine();
+}
 
 var pairing = await client.PairAsync(endpoint, invite, code =>
 {

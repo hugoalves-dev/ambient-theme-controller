@@ -72,7 +72,7 @@ class SensorSessionService : Service() {
 
         startForegroundCompat()
         if (server == null) {
-            server = SensorServer(PORT, identity.sslContext(), identity.deviceId, BuildConfig.VERSION_NAME, registry, ::notifyChanged)
+            server = SensorServer(PORT, identity.sslContext(), identity.deviceId, BuildConfig.VERSION_NAME, registry, ::notifyChanged, ::onSessionAuthenticated)
                 .also { it.start() }
             sensor.start()
             nsd.start(PORT)
@@ -101,7 +101,10 @@ class SensorSessionService : Service() {
     }
 
     fun armInvite(text: String): Boolean {
-        val armed = Invite.parse(text)?.let(registry::arm) ?: false
+        val invite = Invite.parse(text)
+        val armed = invite?.let(registry::arm) ?: false
+        android.util.Log.i("AmbientTheme", "invite parsed=${invite != null} armed=$armed " +
+            "secondsLeft=${invite?.let { it.expiresAtEpochSec - System.currentTimeMillis() / 1000 }}")
         notifyChanged()
         return armed
     }
@@ -143,6 +146,15 @@ class SensorSessionService : Service() {
         // state is UNCERTAIN until real devices show that the sensor keeps working reliably in that state.
         if (isScreenInteractive()) server?.sendReading(lux, ageMs) else screenOffEvents++
         notifyChanged()
+    }
+
+    /**
+     * TYPE_LIGHT is on-change: a still room produces no events, so a newly authenticated computer would wait
+     * forever. Re-registering the listener makes the platform deliver a fresh initial event for this session.
+     */
+    private fun onSessionAuthenticated() = main.post {
+        sensor.stop()
+        sensor.start()
     }
 
     private fun publishStatus() {
