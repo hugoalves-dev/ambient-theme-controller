@@ -1,0 +1,14 @@
+{
+  "HELLO": {"type": "HELLO", "protocolVersion": 1, "messageId": "m1", "deviceId": "dev-1", "sessionId": "s1", "appVersion": "0.1.0", "capabilities": ["LIGHT_SENSOR"]},
+  "AUTH": {"type": "AUTH", "protocolVersion": 1, "messageId": "m2", "clientId": "pc-1", "credential": "c3VwZXItc2VjcmV0"},
+  "AUTH_RESULT_OK": {"type": "AUTH_RESULT", "protocolVersion": 1, "messageId": "m3", "authorized": true},
+  "AUTH_RESULT_REVOKED": {"type": "AUTH_RESULT", "protocolVersion": 1, "messageId": "m4", "authorized": false, "reason": "REVOKED"},
+  "LIGHT_READING": {"type": "LIGHT_READING", "protocolVersion": 1, "messageId": "m5", "sessionId": "s1", "sequence": 7, "measuredAt": "2026-11-16T10:00:00.0000000+00:00", "lux": 42.5, "source": "LIGHT_SENSOR", "quality": "GOOD", "sensorEventAgeMs": 120},
+  "SENSOR_STATUS_ACTIVE": {"type": "SENSOR_STATUS", "protocolVersion": 1, "messageId": "m6", "sessionId": "s1", "state": "ACTIVE", "lastEventAgeMs": 4000},
+  "SENSOR_STATUS_UNCERTAIN": {"type": "SENSOR_STATUS", "protocolVersion": 1, "messageId": "m7", "sessionId": "s1", "state": "UNCERTAIN", "reason": "SCREEN_OFF"},
+  "ACK": {"type": "ACK", "protocolVersion": 1, "messageId": "m8", "correlationId": "m5"},
+  "ERROR": {"type": "ERROR", "protocolVersion": 1, "messageId": "m9", "correlationId": "m5", "code": "READING_REJECTED", "message": "StaleEvent"},
+  "PAIR_REQUEST": {"type": "PAIR_REQUEST", "protocolVersion": 1, "messageId": "m10", "clientId": "pc-1", "clientName": "Desktop", "inviteToken": "dG9rZW4"},
+  "PAIR_APPROVE": {"type": "PAIR_APPROVE", "protocolVersion": 1, "messageId": "m11", "deviceId": "dev-1", "credential": "c3VwZXItc2VjcmV0"},
+  "PAIR_REVOKE": {"type": "PAIR_REVOKE", "protocolVersion": 1, "messageId": "m12", "clientId": "pc-1"}
+}
