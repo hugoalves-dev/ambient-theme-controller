@@ -18,6 +18,7 @@ import android.os.Handler
 import android.os.IBinder
 import android.os.Looper
 import android.os.PowerManager
+import dev.hugodotnet.ambienttheme.core.Addresses
 import dev.hugodotnet.ambienttheme.core.Invite
 import dev.hugodotnet.ambienttheme.core.PairingRegistry
 import dev.hugodotnet.ambienttheme.core.SensorHealth
@@ -100,13 +101,14 @@ class SensorSessionService : Service() {
         super.onDestroy()
     }
 
-    fun armInvite(text: String): Boolean {
-        val invite = Invite.parse(text)
-        val armed = invite?.let(registry::arm) ?: false
-        android.util.Log.i("AmbientTheme", "invite parsed=${invite != null} armed=$armed " +
-            "secondsLeft=${invite?.let { it.expiresAtEpochSec - System.currentTimeMillis() / 1000 }}")
+    /** @return ARMED, NOT_AN_INVITE, or EXPIRED:<seconds ago> (a large value points at a wrong phone or PC clock). */
+    fun armInvite(text: String): String {
+        val invite = Invite.parse(text) ?: return "NOT_AN_INVITE"
+        val secondsLeft = invite.expiresAtEpochSec - System.currentTimeMillis() / 1000
+        val armed = registry.arm(invite)
+        android.util.Log.i("AmbientTheme", "invite armed=$armed secondsLeft=$secondsLeft")
         notifyChanged()
-        return armed
+        return if (armed) "ARMED" else "EXPIRED:${-secondsLeft}"
     }
 
     fun revoke(clientId: String) {
@@ -120,7 +122,8 @@ class SensorSessionService : Service() {
         return mapOf(
             "running" to (server != null),
             "port" to PORT,
-            "addresses" to localAddresses(),
+            "addresses" to localAddresses().filter { Addresses.isPrivateLan(it.substringBefore(":")) },
+            "otherAddresses" to localAddresses().filterNot { Addresses.isPrivateLan(it.substringBefore(":")) },
             "deviceId" to identity.deviceId,
             "displayCode" to identity.displayCode,
             "sensorState" to state.name,

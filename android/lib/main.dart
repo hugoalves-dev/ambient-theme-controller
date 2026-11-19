@@ -41,22 +41,18 @@ class _SessionPageState extends State<SessionPage> {
   }
 
   Future<void> _paste() async {
-    final armed = await _control.invokeMethod<bool>('armInvite', _inviteText.text.trim()) ?? false;
+    final result = await _control.invokeMethod<String>('armInvite', _inviteText.text.trim()) ?? 'NO_SESSION';
     if (!mounted) return;
-    if (armed) _inviteText.clear();
-    _say(armed
-        ? 'Computador autorizado a parear. Continue no computador.'
-        : 'Texto não reconhecido ou convite expirado.');
+    if (result == 'ARMED') _inviteText.clear();
+    _say(inviteMessage(result));
   }
 
   void _say(String message) => ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text(message)));
 
   Future<void> _scan() async {
-    final armed = await _control.invokeMethod<bool>('scanInvite') ?? false;
+    final result = await _control.invokeMethod<String>('scanInvite') ?? 'CANCELLED';
     if (!mounted) return;
-    _say(armed
-        ? 'Computador autorizado a parear. Continue no computador.'
-        : 'Código não reconhecido ou convite expirado.');
+    if (result != 'CANCELLED') _say(inviteMessage(result));
   }
 
   Future<void> _revoke(PairedComputer computer) async {
@@ -120,6 +116,9 @@ class _SessionPageState extends State<SessionPage> {
         const Text('Sem rede local. Conecte ao Wi-Fi ou ao hotspot do computador.')
       else
         for (final address in state.addresses) SelectableText(address, style: Theme.of(context).textTheme.titleLarge),
+      if (state.otherAddresses.isNotEmpty)
+        _Detail('Outras interfaces (operadora, VPN): ${state.otherAddresses.join(', ')}. '
+            'Em geral não alcançam o computador; use o endereço acima.'),
       const _Detail('Se a conexão não for concluída, a rede pode bloquear o tráfego entre os aparelhos. '
           'O aplicativo não contorna firewall nem políticas de rede.'),
     ]),

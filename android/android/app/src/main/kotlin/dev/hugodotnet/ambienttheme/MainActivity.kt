@@ -33,7 +33,7 @@ class MainActivity : FlutterActivity(), EventChannel.StreamHandler {
                     stopService(Intent(this, SensorSessionService::class.java))
                     result.success(null)
                 }
-                "armInvite" -> result.success(SensorSessionService.instance?.armInvite(call.arguments as String) ?: false)
+                "armInvite" -> result.success(SensorSessionService.instance?.armInvite(call.arguments as String) ?: "NO_SESSION")
                 "scanInvite" -> {
                     pendingScan = result
                     IntentIntegrator(this)
@@ -73,7 +73,10 @@ class MainActivity : FlutterActivity(), EventChannel.StreamHandler {
         }
 
         pendingScan = null
-        result.success(scan.contents?.let { SensorSessionService.instance?.armInvite(it) } ?: false)
+        result.success(
+            if (scan.contents == null) "CANCELLED"
+            else SensorSessionService.instance?.armInvite(scan.contents) ?: "NO_SESSION",
+        )
     }
 
     private fun publish() {

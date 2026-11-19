@@ -241,3 +241,20 @@ class SensorHealthTest {
     @Test fun registered_sensor_with_screen_on_is_active() =
         assertEquals(SensorState.ACTIVE to null, SensorHealth.evaluate(true, true, true))
 }
+
+class AddressesTest {
+    @Test fun lan_ranges_are_private() {
+        assertTrue(Addresses.isPrivateLan("192.168.1.236"))
+        assertTrue(Addresses.isPrivateLan("192.168.137.175"))
+        assertTrue(Addresses.isPrivateLan("10.0.2.15"))
+        assertTrue(Addresses.isPrivateLan("172.16.0.5"))
+        assertTrue(Addresses.isPrivateLan("172.31.255.1"))
+    }
+
+    @Test fun carrier_vpn_and_public_ranges_are_not() {
+        assertFalse(Addresses.isPrivateLan("100.66.106.147"))
+        assertFalse(Addresses.isPrivateLan("172.32.0.1"))
+        assertFalse(Addresses.isPrivateLan("8.8.8.8"))
+        assertFalse(Addresses.isPrivateLan("not an ip"))
+    }
+}

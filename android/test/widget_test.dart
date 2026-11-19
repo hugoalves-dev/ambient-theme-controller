@@ -2,6 +2,7 @@ import 'package:ambienttheme/session_state.dart';
 import 'package:flutter_test/flutter_test.dart';
 
 void main() {
+  inviteTests();
   test('stopped session parses with safe defaults', () {
     final state = SessionState.fromMap({'running': false});
 
@@ -63,5 +64,25 @@ void main() {
       }).connectionText,
       'Aguardando o computador conectar.',
     );
+  });
+}
+
+void inviteTests() {
+  test('invite messages say what actually went wrong', () {
+    expect(inviteMessage('ARMED'), contains('autorizado'));
+    expect(inviteMessage('NO_SESSION'), contains('Inicie a sessão'));
+    expect(inviteMessage('NOT_AN_INVITE'), contains('não é um convite'));
+    expect(inviteMessage('EXPIRED:30'), isNot(contains('hora do celular')));
+    expect(inviteMessage('EXPIRED:7200'), contains('data e a hora'));
+  });
+
+  test('carrier and VPN addresses are kept apart from LAN ones', () {
+    final state = SessionState.fromMap({
+      'running': true,
+      'addresses': ['192.168.1.236:8766'],
+      'otherAddresses': ['100.66.106.147:8766'],
+    });
+    expect(state.addresses, ['192.168.1.236:8766']);
+    expect(state.otherAddresses, ['100.66.106.147:8766']);
   });
 }

@@ -205,7 +205,8 @@ internal sealed class PairingWindow : Window
         {
             ConnectionFailure.TlsIdentityMismatch => "Pareamento cancelado: os códigos não foram confirmados. Nada foi enviado ao celular.",
             ConnectionFailure.AuthFailed => "O celular não reconheceu o convite. Escaneie o código no celular antes de continuar.",
-            var failure => $"Não foi possível parear em {_endpoint}: " + Core.Presentation.StatusPresenter.Describe(failure.Value),
+            var failure => $"Não foi possível parear em {_endpoint}: " + Core.Presentation.StatusPresenter.Describe(failure.Value)
+                + (Core.Connection.NetworkHints.Describe(_endpoint, Core.Connection.NetworkHints.LocalNetworks()) is { } hint ? "\n\n" + hint : string.Empty),
         };
         _continue.IsEnabled = true;
     }

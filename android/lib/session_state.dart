@@ -3,6 +3,7 @@ class SessionState {
   const SessionState({
     required this.running,
     this.addresses = const [],
+    this.otherAddresses = const [],
     this.displayCode,
     this.sensorState,
     this.sensorReason,
@@ -19,6 +20,7 @@ class SessionState {
 
   final bool running;
   final List<String> addresses;
+  final List<String> otherAddresses;
   final String? displayCode;
   final String? sensorState;
   final String? sensorReason;
@@ -35,6 +37,7 @@ class SessionState {
   factory SessionState.fromMap(Map<dynamic, dynamic> map) => SessionState(
     running: map['running'] == true,
     addresses: (map['addresses'] as List?)?.cast<String>() ?? const [],
+    otherAddresses: (map['otherAddresses'] as List?)?.cast<String>() ?? const [],
     displayCode: map['displayCode'] as String?,
     sensorState: map['sensorState'] as String?,
     sensorReason: map['sensorReason'] as String?,
@@ -76,4 +79,19 @@ class PairedComputer {
 
   final String id;
   final String name;
+}
+
+/// Plain-language result of arming an invite, from the native result code.
+String inviteMessage(String code) {
+  if (code == 'ARMED') return 'Computador autorizado a parear. Continue no computador agora (vale por 2 minutos).';
+  if (code == 'NO_SESSION') return 'Inicie a sessão de sensor antes de autorizar o computador.';
+  if (code == 'NOT_AN_INVITE') return 'Esse código não é um convite do Ambient Theme.';
+  if (code.startsWith('EXPIRED:')) {
+    final seconds = int.tryParse(code.substring(8)) ?? 0;
+    final age = seconds >= 120
+        ? ' (expirou há ${(seconds / 60).round()} min — se o QR é novo, confira a data e a hora do celular e do computador)'
+        : '';
+    return 'O convite expirou$age. Gere outro no computador e escaneie em até 2 minutos.';
+  }
+  return 'Não foi possível usar o convite.';
 }
