@@ -7,15 +7,24 @@ import java.security.SecureRandom
 import java.util.Base64
 import java.util.UUID
 
+/** How far ahead of the computer's clock the phone's may be without an invite looking expired. */
+const val CLOCK_TOLERANCE_SEC = 60L
+
 /** Temporary single-use invitation read from the QR code shown by Windows. It carries no network address. */
 data class Invite(val clientId: String, val clientName: String, val token: String, val expiresAtEpochSec: Long) {
     companion object {
+        private const val SCHEME = "ambienttheme://"
+
+        /** Refuses text holding more than one invite (e.g. pasted into an old one): it must never borrow the old expiry. */
         fun parse(text: String): Invite? = try {
-            val uri = URI(text.trim())
-            val query = (uri.rawQuery ?: "").split("&").mapNotNull { pair ->
+            val trimmed = text.trim()
+            val uri = URI(trimmed)
+            val pairs = (uri.rawQuery ?: "").split("&").mapNotNull { pair ->
                 pair.split("=", limit = 2).takeIf { it.size == 2 }?.let { it[0] to URLDecoder.decode(it[1], "UTF-8") }
-            }.toMap()
-            if (uri.scheme != "ambienttheme" || uri.host != "pair" || query["v"] != "1") null
+            }
+            val query = pairs.toMap()
+            val single = trimmed.lastIndexOf(SCHEME) == 0 && query.size == pairs.size
+            if (!single || uri.scheme != "ambienttheme" || uri.host != "pair" || query["v"] != "1") null
             else Invite(query.getValue("c"), query.getValue("n"), query.getValue("t"), query.getValue("e").toLong())
         } catch (_: Exception) {
             null
@@ -44,16 +53,19 @@ class PairingRegistry(
 
     @Synchronized
     fun arm(invite: Invite): Boolean {
-        pendingInvite = invite.takeIf { nowEpochSec() < it.expiresAtEpochSec }
+        pendingInvite = invite.takeIf { isValid(it) }
         return pendingInvite != null
     }
+
+    /** The expiry comes from the computer's clock; a phone clock slightly ahead must not shorten the invite. */
+    private fun isValid(invite: Invite) = nowEpochSec() < invite.expiresAtEpochSec + CLOCK_TOLERANCE_SEC
 
     /** @return the new credential, or null when the invite is unknown, different, used or expired. */
     @Synchronized
     fun pair(request: PairRequest): String? {
         val invite = pendingInvite ?: return null
         val matches = invite.clientId == request.clientId &&
-            nowEpochSec() < invite.expiresAtEpochSec &&
+            isValid(invite) &&
             MessageDigest.isEqual(invite.token.toByteArray(), request.inviteToken.toByteArray())
         if (!matches) return null
 

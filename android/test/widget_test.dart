@@ -102,6 +102,18 @@ void inviteTests() {
     expect(inviteMessage('EXPIRED:7200'), contains('data e a hora'));
   });
 
+  test('expired invite always says how long ago it expired', () {
+    expect(inviteMessage('EXPIRED:30'), contains('há 30 s'));
+    expect(inviteMessage('EXPIRED:0'), contains('há 0 s'));
+  });
+
+  test('invite field is cleared after every answer except a stopped session', () {
+    expect(clearsInviteField('ARMED'), isTrue);
+    expect(clearsInviteField('EXPIRED:30'), isTrue);
+    expect(clearsInviteField('NOT_AN_INVITE'), isTrue);
+    expect(clearsInviteField('NO_SESSION'), isFalse);
+  });
+
   test('carrier and VPN addresses are kept apart from LAN ones', () {
     final state = SessionState.fromMap({
       'running': true,

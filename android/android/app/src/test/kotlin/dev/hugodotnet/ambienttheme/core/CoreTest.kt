@@ -65,6 +65,26 @@ class PairingRegistryTest {
         assertNull(Invite.parse("garbage"))
     }
 
+    @Test fun new_invite_pasted_into_an_old_one_is_refused_instead_of_using_the_old_expiry() {
+        val old = "ambienttheme://pair?v=1&c=pc-1&n=Old&t=old-token&e=1000"
+        val fresh = "ambienttheme://pair?v=1&c=pc-1&n=New&t=new-token&e=2000"
+
+        assertNull(Invite.parse(old.substring(0, 40) + fresh + old.substring(40)))
+        assertNull(Invite.parse(old + fresh))
+        assertNull(Invite.parse("ambienttheme://pair?v=1&c=a&n=b&t=c&e=2000&e=1000"))
+    }
+
+    @Test fun invite_survives_a_phone_clock_up_to_a_minute_ahead() {
+        now = 1_179
+        assertTrue(registry.arm(invite))
+        assertNotNull(registry.pair(PairRequest("pc-1", "Desktop", "token")))
+    }
+
+    @Test fun invite_past_the_clock_tolerance_cannot_be_armed() {
+        now = 1_180
+        assertFalse(registry.arm(invite))
+    }
+
     @Test fun scanned_invite_pairs_once_and_yields_a_working_credential() {
         assertTrue(registry.arm(invite))
 
@@ -80,7 +100,7 @@ class PairingRegistryTest {
         registry.arm(invite)
         assertNull(registry.pair(PairRequest("pc-1", "Desktop", "other")))
         assertNull(registry.pair(PairRequest("pc-2", "Desktop", "token")))
-        now = 1_120
+        now = 1_180
         assertNull(registry.pair(PairRequest("pc-1", "Desktop", "token")))
     }
 

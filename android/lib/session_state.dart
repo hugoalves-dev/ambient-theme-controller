@@ -101,6 +101,10 @@ class PairedComputer {
   final String name;
 }
 
+/// Whether the pasted invite should be erased after this result, so the next paste never lands inside an old invite.
+/// A stopped session keeps it: the same invite can be used once the session starts.
+bool clearsInviteField(String code) => code != 'NO_SESSION';
+
 /// Plain-language result of arming an invite, from the native result code.
 String inviteMessage(String code) {
   if (code == 'ARMED') return 'Computador autorizado a parear. Continue no computador agora (vale por 2 minutos).';
@@ -110,7 +114,7 @@ String inviteMessage(String code) {
     final seconds = int.tryParse(code.substring(8)) ?? 0;
     final age = seconds >= 120
         ? ' (expirou há ${(seconds / 60).round()} min — se o QR é novo, confira a data e a hora do celular e do computador)'
-        : '';
+        : ' (expirou há $seconds s)';
     return 'O convite expirou$age. Gere outro no computador e escaneie em até 2 minutos.';
   }
   return 'Não foi possível usar o convite.';

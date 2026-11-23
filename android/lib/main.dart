@@ -50,7 +50,7 @@ class _SessionPageState extends State<SessionPage> {
   Future<void> _paste() async {
     final result = await _control.invokeMethod<String>('armInvite', _inviteText.text.trim()) ?? 'NO_SESSION';
     if (!mounted) return;
-    if (result == 'ARMED') _inviteText.clear();
+    if (clearsInviteField(result)) _inviteText.clear();
     _say(inviteMessage(result));
   }
 
