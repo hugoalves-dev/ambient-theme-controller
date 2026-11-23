@@ -1,0 +1,271 @@
+<Styles xmlns="https://github.com/avaloniaui"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml">
+    <!--
+        Brand palette shared with the Android app (docs/brand/logo.svg):
+        amber #F5A524, amber soft #FFD27A, night #141821. Status: ok #3FB97F, waiting #5B9BF0,
+        paused = amber, problem #E5534B.
+    -->
+    <Styles.Resources>
+        <ResourceDictionary>
+            <ResourceDictionary.ThemeDictionaries>
+                <ResourceDictionary x:Key="Dark">
+                    <SolidColorBrush x:Key="AppBackgroundBrush" Color="#141821" />
+                    <SolidColorBrush x:Key="CardBrush" Color="#1E2430" />
+                    <SolidColorBrush x:Key="CardBorderBrush" Color="#2A3140" />
+                    <SolidColorBrush x:Key="MutedTextBrush" Color="#9AA3B2" />
+                    <SolidColorBrush x:Key="SegmentTrackBrush" Color="#161B25" />
+                    <SolidColorBrush x:Key="SegmentHoverBrush" Color="#2A3140" />
+                    <LinearGradientBrush x:Key="HeroBrush" StartPoint="0%,0%" EndPoint="100%,100%">
+                        <GradientStop Offset="0" Color="#2B2618" />
+                        <GradientStop Offset="0.55" Color="#1E2430" />
+                    </LinearGradientBrush>
+                </ResourceDictionary>
+                <ResourceDictionary x:Key="Light">
+                    <SolidColorBrush x:Key="AppBackgroundBrush" Color="#F6F3EC" />
+                    <SolidColorBrush x:Key="CardBrush" Color="#FFFFFF" />
+                    <SolidColorBrush x:Key="CardBorderBrush" Color="#E8E1D3" />
+                    <SolidColorBrush x:Key="MutedTextBrush" Color="#6B6455" />
+                    <SolidColorBrush x:Key="SegmentTrackBrush" Color="#EFE9DC" />
+                    <SolidColorBrush x:Key="SegmentHoverBrush" Color="#E4DCCB" />
+                    <LinearGradientBrush x:Key="HeroBrush" StartPoint="0%,0%" EndPoint="100%,100%">
+                        <GradientStop Offset="0" Color="#FFF1D2" />
+                        <GradientStop Offset="0.6" Color="#FFFFFF" />
+                    </LinearGradientBrush>
+                </ResourceDictionary>
+            </ResourceDictionary.ThemeDictionaries>
+
+            <Color x:Key="SystemAccentColor">#F5A524</Color>
+            <Color x:Key="SystemAccentColorDark1">#E0951C</Color>
+            <Color x:Key="SystemAccentColorDark2">#C98314</Color>
+            <Color x:Key="SystemAccentColorDark3">#A86B0C</Color>
+            <Color x:Key="SystemAccentColorLight1">#F8B743</Color>
+            <Color x:Key="SystemAccentColorLight2">#FFD27A</Color>
+            <Color x:Key="SystemAccentColorLight3">#FFE3A8</Color>
+            <SolidColorBrush x:Key="AmberBrush" Color="#F5A524" />
+            <SolidColorBrush x:Key="AmberDeepBrush" Color="#C98314" />
+            <SolidColorBrush x:Key="NightBrush" Color="#141821" />
+            <SolidColorBrush x:Key="OkBrush" Color="#3FB97F" />
+            <SolidColorBrush x:Key="WaitingBrush" Color="#5B9BF0" />
+            <SolidColorBrush x:Key="ProblemBrush" Color="#E5534B" />
+            <SolidColorBrush x:Key="AccentButtonForeground" Color="#141821" />
+            <SolidColorBrush x:Key="AccentButtonForegroundPointerOver" Color="#141821" />
+            <SolidColorBrush x:Key="AccentButtonForegroundPressed" Color="#141821" />
+
+            <!-- Segmented control: a RadioButton drawn as a pill inside a shared track. -->
+            <ControlTheme x:Key="SegmentButton" TargetType="RadioButton">
+                <Setter Property="Background" Value="Transparent" />
+                <Setter Property="Foreground" Value="{DynamicResource MutedTextBrush}" />
+                <Setter Property="Padding" Value="12,9" />
+                <Setter Property="CornerRadius" Value="10" />
+                <Setter Property="Cursor" Value="Hand" />
+                <Setter Property="HorizontalAlignment" Value="Stretch" />
+                <Setter Property="Template">
+                    <ControlTemplate>
+                        <Border Background="{TemplateBinding Background}"
+                                CornerRadius="{TemplateBinding CornerRadius}"
+                                Padding="{TemplateBinding Padding}">
+                            <ContentPresenter Name="PART_ContentPresenter"
+                                              Content="{TemplateBinding Content}"
+                                              Foreground="{TemplateBinding Foreground}"
+                                              HorizontalAlignment="Center" />
+                        </Border>
+                    </ControlTemplate>
+                </Setter>
+                <Setter Property="Transitions">
+                    <Transitions>
+                        <BrushTransition Property="Background" Duration="0:0:0.15" />
+                    </Transitions>
+                </Setter>
+                <Style Selector="^:pointerover">
+                    <Setter Property="Background" Value="{DynamicResource SegmentHoverBrush}" />
+                </Style>
+                <Style Selector="^:checked">
+                    <Setter Property="Background" Value="{StaticResource AmberBrush}" />
+                    <Setter Property="Foreground" Value="{StaticResource NightBrush}" />
+                    <Setter Property="FontWeight" Value="SemiBold" />
+                </Style>
+            </ControlTheme>
+        </ResourceDictionary>
+    </Styles.Resources>
+
+    <Style Selector="Window">
+        <Setter Property="Background" Value="{DynamicResource AppBackgroundBrush}" />
+    </Style>
+
+    <!-- Typography -->
+    <Style Selector="TextBlock.h1">
+        <Setter Property="FontSize" Value="20" />
+        <Setter Property="FontWeight" Value="Bold" />
+    </Style>
+    <Style Selector="TextBlock.h2">
+        <Setter Property="FontSize" Value="15" />
+        <Setter Property="FontWeight" Value="SemiBold" />
+        <Setter Property="Margin" Value="0,0,0,4" />
+    </Style>
+    <Style Selector="TextBlock.caption">
+        <Setter Property="FontSize" Value="12" />
+        <Setter Property="Foreground" Value="{DynamicResource MutedTextBrush}" />
+        <Setter Property="TextWrapping" Value="Wrap" />
+    </Style>
+    <Style Selector="TextBlock.label">
+        <Setter Property="FontSize" Value="12" />
+        <Setter Property="Foreground" Value="{DynamicResource MutedTextBrush}" />
+        <Setter Property="Margin" Value="0,6,16,6" />
+    </Style>
+    <Style Selector="TextBlock.value">
+        <Setter Property="TextWrapping" Value="Wrap" />
+        <Setter Property="Margin" Value="0,5" />
+    </Style>
+    <Style Selector="TextBlock.display">
+        <Setter Property="FontSize" Value="46" />
+        <Setter Property="FontWeight" Value="Bold" />
+        <Setter Property="LetterSpacing" Value="-1" />
+    </Style>
+    <Style Selector="TextBlock.code">
+        <Setter Property="FontSize" Value="26" />
+        <Setter Property="FontWeight" Value="Bold" />
+        <Setter Property="FontFamily" Value="Cascadia Mono, Consolas, monospace" />
+        <Setter Property="HorizontalAlignment" Value="Center" />
+    </Style>
+
+    <!-- Cards -->
+    <Style Selector="Border.card">
+        <Setter Property="Background" Value="{DynamicResource CardBrush}" />
+        <Setter Property="BorderBrush" Value="{DynamicResource CardBorderBrush}" />
+        <Setter Property="BorderThickness" Value="1" />
+        <Setter Property="CornerRadius" Value="16" />
+        <Setter Property="Padding" Value="20" />
+    </Style>
+    <Style Selector="Border.card.hero">
+        <Setter Property="Background" Value="{DynamicResource HeroBrush}" />
+        <Setter Property="Padding" Value="24" />
+    </Style>
+    <Style Selector="Border.segments">
+        <Setter Property="Background" Value="{DynamicResource SegmentTrackBrush}" />
+        <Setter Property="CornerRadius" Value="12" />
+        <Setter Property="Padding" Value="4" />
+    </Style>
+
+    <!-- Banners -->
+    <Style Selector="Border.banner">
+        <Setter Property="CornerRadius" Value="12" />
+        <Setter Property="Padding" Value="14,10" />
+        <Setter Property="Background" Value="#26E5534B" />
+        <Setter Property="BorderBrush" Value="#66E5534B" />
+        <Setter Property="BorderThickness" Value="1" />
+    </Style>
+
+    <!-- Status chips: a dot and a short text, coloured by StatusTone. -->
+    <Style Selector="Border.chip">
+        <Setter Property="CornerRadius" Value="999" />
+        <Setter Property="Padding" Value="10,5" />
+        <Setter Property="VerticalAlignment" Value="Center" />
+        <Setter Property="Background" Value="#265B9BF0" />
+    </Style>
+    <Style Selector="Border.chip TextBlock">
+        <Setter Property="FontSize" Value="12" />
+        <Setter Property="FontWeight" Value="SemiBold" />
+        <Setter Property="Foreground" Value="{StaticResource WaitingBrush}" />
+        <Setter Property="VerticalAlignment" Value="Center" />
+    </Style>
+    <Style Selector="Border.chip Ellipse">
+        <Setter Property="Width" Value="8" />
+        <Setter Property="Height" Value="8" />
+        <Setter Property="Fill" Value="{StaticResource WaitingBrush}" />
+        <Setter Property="VerticalAlignment" Value="Center" />
+    </Style>
+    <Style Selector="Border.chip.ok">
+        <Setter Property="Background" Value="#263FB97F" />
+    </Style>
+    <Style Selector="Border.chip.ok TextBlock">
+        <Setter Property="Foreground" Value="{StaticResource OkBrush}" />
+    </Style>
+    <Style Selector="Border.chip.ok Ellipse">
+        <Setter Property="Fill" Value="{StaticResource OkBrush}" />
+    </Style>
+    <Style Selector="Border.chip.paused">
+        <Setter Property="Background" Value="#33F5A524" />
+    </Style>
+    <Style Selector="Border.chip.paused TextBlock">
+        <Setter Property="Foreground" Value="{StaticResource AmberDeepBrush}" />
+    </Style>
+    <Style Selector="Border.chip.paused Ellipse">
+        <Setter Property="Fill" Value="{StaticResource AmberBrush}" />
+    </Style>
+    <Style Selector="Border.chip.problem">
+        <Setter Property="Background" Value="#26E5534B" />
+    </Style>
+    <Style Selector="Border.chip.problem TextBlock">
+        <Setter Property="Foreground" Value="{StaticResource ProblemBrush}" />
+    </Style>
+    <Style Selector="Border.chip.problem Ellipse">
+        <Setter Property="Fill" Value="{StaticResource ProblemBrush}" />
+    </Style>
+
+    <!-- Live chip dot breathes so the user can tell the status is current. -->
+    <Style Selector="Border.chip.ok Ellipse">
+        <Style.Animations>
+            <Animation Duration="0:0:1.6" IterationCount="Infinite" PlaybackDirection="Alternate">
+                <KeyFrame Cue="0%">
+                    <Setter Property="Opacity" Value="1" />
+                </KeyFrame>
+                <KeyFrame Cue="100%">
+                    <Setter Property="Opacity" Value="0.35" />
+                </KeyFrame>
+            </Animation>
+        </Style.Animations>
+    </Style>
+
+    <Style Selector="Button">
+        <Setter Property="CornerRadius" Value="10" />
+        <Setter Property="Padding" Value="14,8" />
+    </Style>
+    <Style Selector="TextBox">
+        <Setter Property="CornerRadius" Value="10" />
+    </Style>
+    <Style Selector="ComboBox">
+        <Setter Property="CornerRadius" Value="10" />
+    </Style>
+
+    <!-- Logo animation, used by the splash window (LogoMark.animated). -->
+    <Style Selector="Canvas.logo-rays.animated">
+        <Style.Animations>
+            <Animation Duration="0:0:8" IterationCount="Infinite">
+                <KeyFrame Cue="0%">
+                    <Setter Property="RotateTransform.Angle" Value="0" />
+                </KeyFrame>
+                <KeyFrame Cue="100%">
+                    <Setter Property="RotateTransform.Angle" Value="360" />
+                </KeyFrame>
+            </Animation>
+        </Style.Animations>
+    </Style>
+    <Style Selector="Ellipse.logo-sun.animated">
+        <Style.Animations>
+            <Animation Duration="0:0:1.2" IterationCount="Infinite" PlaybackDirection="Alternate" Easing="SineEaseInOut">
+                <KeyFrame Cue="0%">
+                    <Setter Property="ScaleTransform.ScaleX" Value="0.93" />
+                    <Setter Property="ScaleTransform.ScaleY" Value="0.93" />
+                </KeyFrame>
+                <KeyFrame Cue="100%">
+                    <Setter Property="ScaleTransform.ScaleX" Value="1" />
+                    <Setter Property="ScaleTransform.ScaleY" Value="1" />
+                </KeyFrame>
+            </Animation>
+        </Style.Animations>
+    </Style>
+    <Style Selector="Ellipse.logo-moon.animated">
+        <Style.Animations>
+            <Animation Duration="0:0:1.1" FillMode="Forward" Easing="CubicEaseOut">
+                <KeyFrame Cue="0%">
+                    <Setter Property="TranslateTransform.X" Value="40" />
+                    <Setter Property="Opacity" Value="0" />
+                </KeyFrame>
+                <KeyFrame Cue="100%">
+                    <Setter Property="TranslateTransform.X" Value="0" />
+                    <Setter Property="Opacity" Value="1" />
+                </KeyFrame>
+            </Animation>
+        </Style.Animations>
+    </Style>
+</Styles>

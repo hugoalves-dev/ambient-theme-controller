@@ -10,7 +10,6 @@
   </Folder>
   <Folder Name="/tools/">
     <Project Path="tools/LinkProbe/LinkProbe.csproj" />
-    <Project Path="tools/ThemePoc/ThemePoc.csproj" />
   </Folder>
   <Folder Name="/tools/SensorSimulator/">
     <Project Path="tools/SensorSimulator/AmbientTheme.SensorSimulator.csproj" />

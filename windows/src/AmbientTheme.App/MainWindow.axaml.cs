@@ -58,6 +58,18 @@ public partial class MainWindow : Window
             SensorText.Text = view.Sensor;
             AutomationText.Text = view.Automation;
             RecommendationText.Text = view.Recommendation;
+            LuxText.Text = view.Lux is { } lux ? lux.ToString("0", CultureInfo.CurrentCulture) + " lx" : "—";
+            LuxText.Opacity = view.Lux is null ? 0.35 : 1;
+            Gauge.Lux = view.Lux;
+            Gauge.DarkBelow = settings.DarkBelowLux;
+            Gauge.LightAbove = settings.LightAboveLux;
+            RenderChip(view);
+            ModeHint.Text = settings.DesiredMode switch
+            {
+                DesiredMode.Auto => "Troca o tema de aplicativos e do sistema juntos.",
+                DesiredMode.RecommendOnly => "Nunca altera o tema: só mostra a recomendação.",
+                _ => "Nada é alterado até você retomar.",
+            };
 
             AutoRadio.IsChecked = settings.DesiredMode == DesiredMode.Auto;
             RecommendRadio.IsChecked = settings.DesiredMode == DesiredMode.RecommendOnly;
@@ -83,6 +95,16 @@ public partial class MainWindow : Window
         }
     }
 
+    private void RenderChip(StatusView view)
+    {
+        AutomationChipText.Text = view.Automation;
+        ToolTip.SetTip(AutomationChip, view.Automation);
+        foreach (var tone in Enum.GetValues<StatusTone>())
+        {
+            AutomationChip.Classes.Set(tone.ToString().ToLowerInvariant(), tone == view.Tone);
+        }
+    }
+
     private void ShowLoadWarning(SettingsLoadStatus status)
     {
         SettingsWarning.Text = status switch
@@ -93,7 +115,7 @@ public partial class MainWindow : Window
                 "As configurações foram gravadas por uma versão mais nova. Esta sessão não vai gravar alterações para não perdê-las.",
             _ => null,
         };
-        SettingsWarning.IsVisible = SettingsWarning.Text is not null;
+        SettingsWarningBanner.IsVisible = SettingsWarning.Text is not null;
     }
 
     private void OnMode(RadioButton radio, Action apply)

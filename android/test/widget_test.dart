@@ -3,6 +3,7 @@ import 'package:flutter_test/flutter_test.dart';
 
 void main() {
   inviteTests();
+  toneTests();
   test('stopped session parses with safe defaults', () {
     final state = SessionState.fromMap({'running': false});
 
@@ -64,6 +65,31 @@ void main() {
       }).connectionText,
       'Aguardando o computador conectar.',
     );
+  });
+}
+
+void toneTests() {
+  test('sensor tone follows sensor health, not the connection', () {
+    expect(SessionState.fromMap({'running': true, 'sensorState': 'ACTIVE', 'lux': 12}).sensorTone, Tone.ok);
+    expect(SessionState.fromMap({'running': true, 'sensorState': 'ACTIVE'}).sensorTone, Tone.waiting);
+    expect(SessionState.fromMap({'running': true, 'sensorState': 'UNCERTAIN', 'connectedClientId': 'pc-1'}).sensorTone,
+        Tone.paused);
+    expect(SessionState.fromMap({'running': true, 'sensorState': 'UNAVAILABLE'}).sensorTone, Tone.problem);
+    expect(SessionState.fromMap({'running': true, 'sensorState': 'ERROR'}).sensorTone, Tone.problem);
+  });
+
+  test('connection tone distinguishes connected, waiting and no computer', () {
+    final computer = {'id': 'pc-1', 'name': 'Desktop'};
+    expect(SessionState.fromMap({'running': true, 'connectedClientId': 'pc-1', 'clients': [computer]}).connectionTone,
+        Tone.ok);
+    expect(SessionState.fromMap({'running': true, 'clients': [computer]}).connectionTone, Tone.waiting);
+    expect(SessionState.fromMap({'running': true}).connectionTone, Tone.paused);
+  });
+
+  test('lux headline never invents a value', () {
+    expect(SessionState.fromMap({'running': true, 'sensorState': 'ACTIVE', 'lux': 42.4}).luxHeadline, '42 lx');
+    expect(SessionState.fromMap({'running': true, 'sensorState': 'ACTIVE'}).luxHeadline, '—');
+    expect(SessionState.fromMap({'running': true, 'sensorState': 'UNCERTAIN', 'lux': 42.4}).luxHeadline, '—');
   });
 }
 

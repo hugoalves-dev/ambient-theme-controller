@@ -1,0 +1,8 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <!-- Brand palette, shared with the Windows app (docs/brand/logo.svg). -->
+    <color name="brand_night">#141821</color>
+    <color name="brand_amber">#F5A524</color>
+    <color name="brand_amber_soft">#FFD27A</color>
+    <color name="splash_background">#141821</color>
+</resources>

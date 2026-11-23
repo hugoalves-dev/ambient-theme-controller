@@ -9,19 +9,49 @@ using QRCoder;
 
 namespace AmbientTheme.App;
 
-/// <summary>Tray and window icon drawn at runtime, so the repository carries no binary asset.</summary>
+/// <summary>Tray and window icon rendered from the vector logo at runtime (the .exe icon is Assets/app.ico).</summary>
 internal static class AppIcon
 {
+    private const int Pixels = 64;
+
     public static WindowIcon Create()
     {
-        var bitmap = new RenderTargetBitmap(new PixelSize(64, 64));
-        using (var context = bitmap.CreateDrawingContext())
+        var logo = new LogoMark { Width = Pixels, Height = Pixels };
+        logo.Measure(new Size(Pixels, Pixels));
+        logo.Arrange(new Rect(0, 0, Pixels, Pixels));
+        var bitmap = new RenderTargetBitmap(new PixelSize(Pixels, Pixels));
+        bitmap.Render(logo);
+        return new WindowIcon(bitmap);
+    }
+}
+
+/// <summary>Small builders shared by the code-only windows, so they match the main window's style.</summary>
+internal static class Ui
+{
+    public static Button Button(string text, Action action, bool accent = false)
+    {
+        var button = new Button { Content = text };
+        button.Classes.Set("accent", accent);
+        button.Click += (_, _) => action();
+        return button;
+    }
+
+    public static StackPanel Buttons(params Control[] buttons)
+    {
+        var row = new StackPanel { Orientation = Orientation.Horizontal, Spacing = 8, HorizontalAlignment = HorizontalAlignment.Right };
+        row.Children.AddRange(buttons);
+        return row;
+    }
+
+    public static TextBlock Text(string text, string? styleClass = null)
+    {
+        var block = new TextBlock { Text = text, TextWrapping = TextWrapping.Wrap };
+        if (styleClass is not null)
         {
-            context.DrawEllipse(Brushes.Gold, null, new Point(32, 32), 28, 28);
-            context.DrawEllipse(new SolidColorBrush(Color.FromRgb(32, 36, 48)), null, new Point(44, 28), 22, 22);
+            block.Classes.Add(styleClass);
         }
 
-        return new WindowIcon(bitmap);
+        return block;
     }
 }
 
@@ -31,29 +61,35 @@ internal sealed class NotificationWindow : Window
     public NotificationWindow(string message, Action? resume)
     {
         Title = "Ambient Theme Controller";
-        Width = 380;
+        Width = 400;
         SizeToContent = SizeToContent.Height;
         CanResize = false;
         ShowInTaskbar = false;
         ShowActivated = false;
         Topmost = true;
+        WindowDecorations = WindowDecorations.None;
+        TransparencyLevelHint = [WindowTransparencyLevel.Transparent];
+        Background = Brushes.Transparent;
         WindowStartupLocation = WindowStartupLocation.Manual;
 
-        var panel = new StackPanel { Margin = new Thickness(16), Spacing = 10 };
-        panel.Children.Add(new TextBlock { Text = message, TextWrapping = TextWrapping.Wrap });
-        var buttons = new StackPanel { Orientation = Orientation.Horizontal, Spacing = 8, HorizontalAlignment = HorizontalAlignment.Right };
-        if (resume is not null)
-        {
-            buttons.Children.Add(Button("Retomar automático", () =>
+        var buttons = resume is null
+            ? Ui.Buttons(Ui.Button("Fechar", Close))
+            : Ui.Buttons(Ui.Button("Fechar", Close), Ui.Button("Retomar automático", () =>
             {
                 resume();
                 Close();
-            }));
-        }
-
-        buttons.Children.Add(Button("Fechar", Close));
-        panel.Children.Add(buttons);
-        Content = panel;
+            }, accent: true));
+        var header = new StackPanel
+        {
+            Orientation = Orientation.Horizontal,
+            Spacing = 10,
+            Children = { new LogoMark { Width = 22, Height = 22 }, Ui.Text("Ambient Theme", "h2") },
+        };
+        Content = new Border
+        {
+            Classes = { "card" },
+            Child = new StackPanel { Spacing = 10, Children = { header, Ui.Text(message), buttons } },
+        };
 
         Opened += (_, _) =>
         {
@@ -66,13 +102,6 @@ internal sealed class NotificationWindow : Window
             DispatcherTimer.RunOnce(Close, TimeSpan.FromSeconds(15));
         };
     }
-
-    private static Button Button(string text, Action action)
-    {
-        var button = new Button { Content = text };
-        button.Click += (_, _) => action();
-        return button;
-    }
 }
 
 /// <summary>Yes/no question used for the fingerprint comparison and for destructive choices.</summary>
@@ -81,36 +110,20 @@ internal sealed class ConfirmDialog : Window
     private ConfirmDialog(string title, string message, string? code, string accept)
     {
         Title = title;
-        Width = 460;
+        Width = 480;
         SizeToContent = SizeToContent.Height;
         CanResize = false;
         WindowStartupLocation = WindowStartupLocation.CenterOwner;
 
-        var panel = new StackPanel { Margin = new Thickness(20), Spacing = 14 };
-        panel.Children.Add(new TextBlock { Text = message, TextWrapping = TextWrapping.Wrap });
+        var panel = new StackPanel { Margin = new Thickness(24), Spacing = 16 };
+        panel.Children.Add(Ui.Text(title, "h1"));
+        panel.Children.Add(Ui.Text(message));
         if (code is not null)
         {
-            panel.Children.Add(new TextBlock
-            {
-                Text = code,
-                FontSize = 28,
-                FontWeight = FontWeight.Bold,
-                FontFamily = new FontFamily("Consolas, monospace"),
-                HorizontalAlignment = HorizontalAlignment.Center,
-            });
+            panel.Children.Add(new Border { Classes = { "card" }, Child = Ui.Text(code, "code") });
         }
 
-        var yes = new Button { Content = accept };
-        yes.Click += (_, _) => Close(true);
-        var no = new Button { Content = "Cancelar" };
-        no.Click += (_, _) => Close(false);
-        panel.Children.Add(new StackPanel
-        {
-            Orientation = Orientation.Horizontal,
-            Spacing = 8,
-            HorizontalAlignment = HorizontalAlignment.Right,
-            Children = { no, yes },
-        });
+        panel.Children.Add(Ui.Buttons(Ui.Button("Cancelar", () => Close(false)), Ui.Button(accept, () => Close(true), accent: true)));
         Content = panel;
     }
 
@@ -128,7 +141,13 @@ internal sealed class PairingWindow : Window
     private readonly Endpoint _endpoint;
     private readonly PairingInvite _invite;
     private readonly TextBlock _status = new() { TextWrapping = TextWrapping.Wrap };
-    private readonly Button _continue = new() { Content = "Já escaneei no celular — continuar" };
+    private readonly Button _continue = new()
+    {
+        Content = "Já escaneei no celular — continuar",
+        Classes = { "accent" },
+        HorizontalAlignment = HorizontalAlignment.Stretch,
+        HorizontalContentAlignment = HorizontalAlignment.Center,
+    };
 
     public PairingWindow(AppHost host, Endpoint endpoint)
     {
@@ -137,7 +156,7 @@ internal sealed class PairingWindow : Window
         _invite = PairingInvite.Create(host.Settings.Current.ClientId, Environment.MachineName, DateTimeOffset.UtcNow);
 
         Title = "Parear celular";
-        Width = 460;
+        Width = 480;
         SizeToContent = SizeToContent.Height;
         CanResize = false;
         WindowStartupLocation = WindowStartupLocation.CenterOwner;
@@ -145,24 +164,24 @@ internal sealed class PairingWindow : Window
         _continue.Click += async (_, _) => await PairAsync();
         Content = new StackPanel
         {
-            Margin = new Thickness(20),
-            Spacing = 12,
+            Margin = new Thickness(24),
+            Spacing = 14,
             Children =
             {
-                new TextBlock
+                Ui.Text("Parear celular", "h1"),
+                Ui.Text("1. No celular, abra o Ambient Theme Controller e inicie a sessão de sensor.\n" +
+                        "2. Toque em \"Autorizar computador\" e aponte a câmera para este código.\n" +
+                        $"3. Volte aqui e continue. O convite vale por {PairingInvite.Lifetime.TotalMinutes:0} minutos e só pode ser usado uma vez."),
+                new Border
                 {
-                    TextWrapping = TextWrapping.Wrap,
-                    Text = "1. No celular, abra o Ambient Theme Controller e inicie a sessão de sensor.\n" +
-                           "2. Toque em \"Autorizar computador\" e aponte a câmera para este código.\n" +
-                           $"3. Volte aqui e continue. O convite vale por {PairingInvite.Lifetime.TotalMinutes:0} minutos e só pode ser usado uma vez.",
+                    // QR codes need a light quiet zone, whatever the app theme.
+                    Background = Brushes.White,
+                    CornerRadius = new CornerRadius(16),
+                    Padding = new Thickness(12),
+                    HorizontalAlignment = HorizontalAlignment.Center,
+                    Child = new Image { Source = QrCode(_invite.ToUri()), Width = 240, Height = 240 },
                 },
-                new Image { Source = QrCode(_invite.ToUri()), Width = 260, Height = 260 },
-                new TextBlock
-                {
-                    TextWrapping = TextWrapping.Wrap,
-                    Opacity = 0.7,
-                    Text = $"O código não contém endereço. A conexão será feita em {_endpoint}.",
-                },
+                Ui.Text($"O código não contém endereço. A conexão será feita em {_endpoint}.", "caption"),
                 new TextBox { Text = _invite.ToUri(), IsReadOnly = true, FontSize = 10 },
                 _continue,
                 _status,

@@ -1,0 +1,40 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- Static logo for the pre-Android-12 launch window. Geometry of docs/brand/logo.svg (120x120). -->
+<vector xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:aapt="http://schemas.android.com/aapt"
+    android:width="160dp"
+    android:height="160dp"
+    android:viewportWidth="120"
+    android:viewportHeight="120">
+    <group android:pivotX="60" android:pivotY="60" android:rotation="0">
+        <path android:fillColor="@color/brand_amber" android:pathData="M56,8a4,4 0,0 1,8 0v8a4,4 0,0 1,-8 0z" />
+    </group>
+    <group android:pivotX="60" android:pivotY="60" android:rotation="45">
+        <path android:fillColor="@color/brand_amber" android:pathData="M56,8a4,4 0,0 1,8 0v8a4,4 0,0 1,-8 0z" />
+    </group>
+    <group android:pivotX="60" android:pivotY="60" android:rotation="90">
+        <path android:fillColor="@color/brand_amber" android:pathData="M56,8a4,4 0,0 1,8 0v8a4,4 0,0 1,-8 0z" />
+    </group>
+    <group android:pivotX="60" android:pivotY="60" android:rotation="135">
+        <path android:fillColor="@color/brand_amber" android:pathData="M56,8a4,4 0,0 1,8 0v8a4,4 0,0 1,-8 0z" />
+    </group>
+    <group android:pivotX="60" android:pivotY="60" android:rotation="180">
+        <path android:fillColor="@color/brand_amber" android:pathData="M56,8a4,4 0,0 1,8 0v8a4,4 0,0 1,-8 0z" />
+    </group>
+    <group android:pivotX="60" android:pivotY="60" android:rotation="225">
+        <path android:fillColor="@color/brand_amber" android:pathData="M56,8a4,4 0,0 1,8 0v8a4,4 0,0 1,-8 0z" />
+    </group>
+    <group android:pivotX="60" android:pivotY="60" android:rotation="270">
+        <path android:fillColor="@color/brand_amber" android:pathData="M56,8a4,4 0,0 1,8 0v8a4,4 0,0 1,-8 0z" />
+    </group>
+    <group android:pivotX="60" android:pivotY="60" android:rotation="315">
+        <path android:fillColor="@color/brand_amber" android:pathData="M56,8a4,4 0,0 1,8 0v8a4,4 0,0 1,-8 0z" />
+    </group>
+    <path android:pathData="M30,60a30,30 0,1 0,60 0a30,30 0,1 0,-60 0z">
+        <aapt:attr name="android:fillColor">
+            <gradient android:type="radial" android:centerX="51" android:centerY="49" android:gradientRadius="45"
+                android:startColor="@color/brand_amber_soft" android:endColor="@color/brand_amber" />
+        </aapt:attr>
+    </path>
+    <path android:fillColor="@color/brand_night" android:pathData="M52,48a24,24 0,1 0,48 0a24,24 0,1 0,-48 0z" />
+</vector>

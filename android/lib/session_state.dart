@@ -65,6 +65,23 @@ class SessionState {
     _ => '—',
   };
 
+  /// Colour family of the sensor chip. Driven by sensor health only.
+  Tone get sensorTone => switch (sensorState) {
+    'ACTIVE' => lux == null ? Tone.waiting : Tone.ok,
+    'UNCERTAIN' => Tone.paused,
+    'UNAVAILABLE' || 'ERROR' => Tone.problem,
+    _ => Tone.waiting,
+  };
+
+  Tone get connectionTone => connectedClientId != null
+      ? Tone.ok
+      : clients.isEmpty
+      ? Tone.paused
+      : Tone.waiting;
+
+  /// Big number on the hero card: only a trusted, active reading.
+  String get luxHeadline => sensorState == 'ACTIVE' && lux != null ? '${lux!.toStringAsFixed(0)} lx' : '—';
+
   String get connectionText {
     if (connectedClientId == null) {
       return clients.isEmpty ? 'Nenhum computador autorizado.' : 'Aguardando o computador conectar.';
@@ -73,6 +90,9 @@ class SessionState {
     return 'Conectado: ${name ?? 'computador autorizado'}';
   }
 }
+
+/// Status colour family shared by the chips (same palette as the Windows app).
+enum Tone { ok, waiting, paused, problem }
 
 class PairedComputer {
   const PairedComputer(this.id, this.name);

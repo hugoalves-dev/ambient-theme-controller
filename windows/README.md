@@ -10,9 +10,9 @@ rights or proprietary dependency. Licensed under Apache-2.0.
 |---|---|
 | `src/AmbientTheme.Core` | Pure, deterministic logic: protocol v1, measurement validation, settings, recommendation engine, automation coordinator, theme adapter logic, WSS client, pairing, reconnection. |
 | `src/AmbientTheme.Windows` | Win32 edges only: registry values, `RegNotifyChangeKeyValue` watcher, contrast-theme probe, DPAPI secret store. |
-| `src/AmbientTheme.App` | Avalonia shell: tray icon, status, modes, thresholds, pairing by QR + manual address, notifications. |
+| `src/AmbientTheme.App` | Avalonia shell: animated splash, tray icon, status, modes, thresholds, pairing by QR + manual address, notifications. Styles live in `Styles/Theme.axaml`. |
 | `tools/SensorSimulator` | Plays the Android role of the protocol for tests and development. Its readings are tagged `SIMULATED`. |
-| `tools/ThemePoc` | Reads, watches and (only on explicit command) changes the real Windows theme through the product's adapter. |
+| `tools/make-app-icon.ps1` | Regenerates `src/AmbientTheme.App/Assets/app.ico` from the brand logo (`docs/brand/logo.svg`). |
 | `tests/` | xUnit tests. `Windows.Tests` uses the real registry APIs on a scratch key, never the real theme. |
 
 Only the `AutomationCoordinator` may ask for a theme write. Network messages, the UI and ACKs cannot.
@@ -40,16 +40,6 @@ under the QR into the simulator as `invite <text>`, continue, and compare the fi
 
 Simulated readings are refused by default. To let them drive the engine for development, start the app with
 `ATC_ALLOW_SIMULATED=1`; the window shows a warning banner. **In automatic mode this changes your real theme.**
-
-### Evidence for the theme PoC (issue #3)
-
-```
-dotnet run --project windows/tools/ThemePoc -- read
-dotnet run --project windows/tools/ThemePoc -- watch
-dotnet run --project windows/tools/ThemePoc -- roundtrip
-```
-
-`read` and `watch` never write. `roundtrip` switches the theme, waits 8 s and restores the original.
 
 ## Defaults (uncalibrated hypotheses, spec §6 and §19)
 

@@ -9,10 +9,14 @@ using AmbientTheme.Core.Theme;
 namespace AmbientTheme.Core.Presentation;
 
 /// <summary>Network, identity, sensor and automation are always reported as separate lines (spec §10).</summary>
-public sealed record StatusView(string Network, string Identity, string Sensor, string Automation, string Recommendation)
+public sealed record StatusView(string Network, string Identity, string Sensor, string Automation, string Recommendation,
+    double? Lux, StatusTone Tone)
 {
     public string TrayTooltip => $"Ambient Theme Controller — {Automation}";
 }
+
+/// <summary>Colour family of the automation state, so the UI never parses wording.</summary>
+public enum StatusTone { Ok, Waiting, Paused, Problem }
 
 /// <summary>All user-facing wording in one place, independent from the UI toolkit.</summary>
 public static class StatusPresenter
@@ -20,7 +24,18 @@ public static class StatusPresenter
     public static StatusView Present(CoordinatorStatus status, AppSettings settings,
         (Endpoint Endpoint, ConnectionFailure Failure)? lastFailure) =>
         new(Network(status, lastFailure), Identity(status, settings, lastFailure), Sensor(status),
-            Automation(status), Recommendation(status.Recommendation));
+            Automation(status), Recommendation(status.Recommendation), TrustedLux(status), Tone(status));
+
+    private static double? TrustedLux(CoordinatorStatus status) =>
+        status.State is RuntimeState.Stabilizing or RuntimeState.Ready or RuntimeState.Active ? status.Lux : null;
+
+    private static StatusTone Tone(CoordinatorStatus status) => status switch
+    {
+        { Fatal: not null } or { ApplyBlocked: true } => StatusTone.Problem,
+        { Mode: DesiredMode.ManualPause or DesiredMode.RecommendOnly } or { ContrastBlocked: true } => StatusTone.Paused,
+        { State: RuntimeState.Active } => StatusTone.Ok,
+        _ => StatusTone.Waiting,
+    };
 
     public static string Describe(NotificationKind kind) => kind switch
     {

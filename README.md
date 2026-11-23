@@ -6,7 +6,7 @@ Android as an **external ambient-light sensor** for Windows 11: measure room bri
 
 ## What has been validated
 
-- **Transport (PoC, real devices):** a local bidirectional WebSocket between Android (Termux/Python server) and Windows 11 (PowerShell/.NET client) over a Windows-created Wi-Fi hotspot, with simulated 5/25/50/100/200 lux samples, without root/admin.
+- **Transport (early prototype on real devices, since removed from the repository):** a local bidirectional WebSocket between Android (Termux/Python server) and Windows 11 (PowerShell/.NET client) over a Windows-created Wi-Fi hotspot, with simulated 5/25/50/100/200 lux samples, without root/admin.
 - **Windows implementation (automated tests on Windows 11):** versioned protocol and validation, local settings and DPAPI-protected credentials, recommendation engine, automation state machine, joint apps+system theme writes with external-change detection, and a certificate-pinned WSS client exercised against a simulator of the Android side.
 
 **Still unvalidated:** physical light-sensor acquisition, Android background behavior, pairing and discovery on real phones, and the visual result of switching the real Windows theme. See the open issues.

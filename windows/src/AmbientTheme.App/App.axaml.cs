@@ -36,7 +36,7 @@ public partial class App : Application, INotifier
 
             if (!desktop.Args?.Contains("--tray") ?? true)
             {
-                _window.Show();
+                SplashWindow.ShowThen(_window.Show);
             }
 
             Refresh();

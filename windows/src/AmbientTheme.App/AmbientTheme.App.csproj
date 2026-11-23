@@ -4,6 +4,8 @@
     <TargetFramework>net10.0-windows</TargetFramework>
     <AssemblyName>AmbientThemeController</AssemblyName>
     <ApplicationManifest>app.manifest</ApplicationManifest>
+    <!-- Generated from the brand logo by windows/tools/make-app-icon.ps1. -->
+    <ApplicationIcon>Assets/app.ico</ApplicationIcon>
   </PropertyGroup>
 
   <ItemGroup>

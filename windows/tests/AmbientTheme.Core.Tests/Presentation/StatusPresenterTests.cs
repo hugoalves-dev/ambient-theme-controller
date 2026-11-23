@@ -151,4 +151,23 @@ public class StatusPresenterTests
     {
         Assert.All(Enum.GetValues<ThresholdPreset>(), preset => Assert.NotEmpty(StatusPresenter.Describe(preset)));
     }
+
+    [Fact]
+    public void Tone_reflects_automation_state()
+    {
+        Assert.Equal(StatusTone.Ok, Present(Status(RuntimeState.Active)).Tone);
+        Assert.Equal(StatusTone.Paused, Present(Status(RuntimeState.Ready, DesiredMode.ManualPause, PauseReason.UserPaused)).Tone);
+        Assert.Equal(StatusTone.Paused, Present(Status(RuntimeState.Ready, DesiredMode.RecommendOnly)).Tone);
+        Assert.Equal(StatusTone.Problem, Present(Status(RuntimeState.Ready, applyBlocked: true)).Tone);
+        Assert.Equal(StatusTone.Problem, Present(Status(RuntimeState.Disconnected, fatal: FatalFailure.AuthFailed)).Tone);
+        Assert.Equal(StatusTone.Waiting, Present(Status(RuntimeState.Reconnecting)).Tone);
+    }
+
+    [Fact]
+    public void Lux_is_exposed_only_while_the_reading_is_trusted()
+    {
+        Assert.Equal(42, Present(Status(RuntimeState.Active, lux: 42)).Lux);
+        Assert.Null(Present(Status(RuntimeState.Degraded, lux: 42)).Lux);
+        Assert.Null(Present(Status(RuntimeState.WaitingForSensor, lux: 42)).Lux);
+    }
 }

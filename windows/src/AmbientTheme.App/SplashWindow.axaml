@@ -1,0 +1,49 @@
+<Window xmlns="https://github.com/avaloniaui"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:app="clr-namespace:AmbientTheme.App"
+        x:Class="AmbientTheme.App.SplashWindow"
+        Title="Ambient Theme Controller"
+        Width="340" Height="360"
+        CanResize="False"
+        ShowInTaskbar="False"
+        WindowDecorations="None"
+        TransparencyLevelHint="Transparent"
+        Background="Transparent"
+        WindowStartupLocation="CenterScreen">
+    <Border CornerRadius="28" ClipToBounds="True" BorderBrush="#2A3140" BorderThickness="1">
+        <Border.Background>
+            <RadialGradientBrush Center="50%,38%" GradientOrigin="50%,38%" RadiusX="80%" RadiusY="80%">
+                <GradientStop Offset="0" Color="#2B2618" />
+                <GradientStop Offset="0.6" Color="#141821" />
+            </RadialGradientBrush>
+        </Border.Background>
+        <StackPanel VerticalAlignment="Center" HorizontalAlignment="Center" Spacing="18">
+            <app:LogoMark Width="150" Height="150" IsAnimated="True" />
+            <StackPanel x:Name="Caption" Spacing="4" Opacity="0">
+                <TextBlock Text="Ambient Theme" FontSize="24" FontWeight="Bold" Foreground="#F6F3EC"
+                           HorizontalAlignment="Center" />
+                <TextBlock Text="O tema do Windows guiado pela luz do ambiente" FontSize="12" Foreground="#9AA3B2"
+                           HorizontalAlignment="Center" />
+            </StackPanel>
+            <ProgressBar IsIndeterminate="True" Width="120" Height="3" MinHeight="3" Foreground="#F5A524"
+                         Background="#2A3140" />
+        </StackPanel>
+    </Border>
+
+    <Window.Styles>
+        <Style Selector="StackPanel#Caption">
+            <Style.Animations>
+                <Animation Duration="0:0:0.7" Delay="0:0:0.35" FillMode="Forward" Easing="CubicEaseOut">
+                    <KeyFrame Cue="0%">
+                        <Setter Property="Opacity" Value="0" />
+                        <Setter Property="TranslateTransform.Y" Value="8" />
+                    </KeyFrame>
+                    <KeyFrame Cue="100%">
+                        <Setter Property="Opacity" Value="1" />
+                        <Setter Property="TranslateTransform.Y" Value="0" />
+                    </KeyFrame>
+                </Animation>
+            </Style.Animations>
+        </Style>
+    </Window.Styles>
+</Window>
